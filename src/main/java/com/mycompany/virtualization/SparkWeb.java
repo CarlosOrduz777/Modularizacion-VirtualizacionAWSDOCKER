@@ -1,10 +1,15 @@
 package com.mycompany.virtualization;
+import com.mycompany.virtualization.connection.HttpConnection;
+
 import static spark.Spark.*;
 public class SparkWeb {
 
     public static void main(String[] args) {
-        get("hello", (req, res) -> {
-            return "Hello World";
+        port(getPort());
+        HttpConnection connection = new HttpConnection();
+        staticFiles.location("/public");
+        get("/hello", (req, res) -> {
+            return connection.mongoConnection();
         });
     }
 
