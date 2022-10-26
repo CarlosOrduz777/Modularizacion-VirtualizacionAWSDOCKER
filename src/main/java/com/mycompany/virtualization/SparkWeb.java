@@ -7,8 +7,10 @@ public class SparkWeb {
     public static void main(String[] args) {
         port(getPort());
         HttpConnection connection = new HttpConnection();
-        staticFiles.location("/public");
-        get("/hello", (req, res) -> {
+        get("/log", (req, res) -> {
+            res.type("application/json");
+            String cadena  = req.queryParams("cadena");
+            connection.insert(cadena);
             return connection.mongoConnection();
         });
     }

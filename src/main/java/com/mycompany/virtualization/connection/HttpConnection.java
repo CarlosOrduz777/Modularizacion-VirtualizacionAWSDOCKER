@@ -9,17 +9,19 @@ import com.mongodb.client.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class HttpConnection {
     private static final String USER_AGENT = "Mozilla/5.0";
 
-    public String mongoConnection(){
-        ConnectionString connectionString = new ConnectionString("mongodb+srv://carlos:sanord20@mongo.fwxzofj.mongodb.net/?retryWrites=true&w=majority");
+    public List<Document> mongoConnection(){
+        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017");
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
-                .serverApi(ServerApi.builder()
-                        .version(ServerApiVersion.V1)
-                        .build())
                 .build();
+
         MongoClient mongoClient = MongoClients.create(settings);
         MongoDatabase database = mongoClient.getDatabase("mongo");
         MongoCollection<Document> customers = database.getCollection("customers");
@@ -27,21 +29,35 @@ public class HttpConnection {
         FindIterable<Document> iterable = customers.find();
         MongoCursor<Document> cursor = iterable.iterator();
 
+        List<Document> listret = new ArrayList<>();
+        StringBuffer response;
+        //Recorre el iterador obtenido del iterable
         while (cursor.hasNext()) {
+            System.out.println("desdee el iterador------->");
             System.out.println(cursor.next());
+            if(listret.size() <= 10){
+                listret.add(cursor.next());
+
+            }
         }
-        Document student1 = customers.find(new Document("_id", 123)).first();
-        //Crea un documento BSON con el cliente
-        //Document customer = new Document("_id", new ObjectId("12345"));
-        //customer.append("firstName", "Carlos");
-        //customer.append("lastName", "Orduz");
 
+        return listret;
+    }
 
+    public void insert(String cadena){
+        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017");
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .build();
 
-        //Agrega el nuevo cliente a la colección
-        //customers.insertOne(customer);
+        MongoClient mongoClient = MongoClients.create(settings);
+        MongoDatabase database = mongoClient.getDatabase("mongo");
+        MongoCollection<Document> customers = database.getCollection("customers");
 
-        return student1.toJson();
+        Document document = new Document();
+        document.append("cadena",cadena);
+        document.append("fecha", new Date());
+        customers.insertOne(document);
     }
 
 
